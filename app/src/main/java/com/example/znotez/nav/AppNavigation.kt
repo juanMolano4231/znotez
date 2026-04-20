@@ -1,6 +1,7 @@
 package com.example.znotez.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,7 +41,7 @@ fun AppNavigation() {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToNotes = { navController.navigate(Screen.Notes.route) }
+                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
             )
         }
         composable(Screen.Groups.route) {
