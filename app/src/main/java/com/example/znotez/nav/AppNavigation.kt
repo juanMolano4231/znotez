@@ -48,7 +48,8 @@ fun AppNavigation() {
             GroupsScreen(
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToEditGroup = { navController.navigate(Screen.EditGroup.createRoute(null)) } ,
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
+                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) },
+                onNavigateToNotes = { navController.navigate(Screen.Notes.route) },
             )
         }
         composable(Screen.Notes.route) {

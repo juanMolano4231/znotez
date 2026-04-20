@@ -2,6 +2,7 @@ package com.example.znotez.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.znotez.shared.ElementCard
 
 @Composable
 fun GroupsScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToEditGroup: () -> Unit,
-    onNavigateToEditNote: () -> Unit
+    onNavigateToEditNote: () -> Unit,
+    onNavigateToNotes: () -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -100,8 +103,11 @@ fun GroupsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(20) { index ->   // 8 mock items
-                        GroupCard(title = "Group ${index + 1}")
+                    items(20) { index ->
+                        ElementCard(
+                            title = "Group ${index + 1}",
+                            onClick = { onNavigateToNotes() }
+                        )
                     }
                 }
 
@@ -126,36 +132,6 @@ fun GroupsScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-// Group Card
-@Composable
-fun GroupCard(title: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF))
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = null,
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
-            )
         }
     }
 }
