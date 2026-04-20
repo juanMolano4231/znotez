@@ -46,7 +46,7 @@ fun AppNavigation() {
         }
         composable(Screen.Groups.route) {
             GroupsScreen(
-                onNavigateToHome = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToEditGroup = { navController.navigate(Screen.EditGroup.createRoute(null)) } ,
                 onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
             )
