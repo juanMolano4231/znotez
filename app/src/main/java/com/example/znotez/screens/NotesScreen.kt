@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.znotez.shared.ElementCard
 
 
 @Composable
@@ -107,7 +108,10 @@ fun NotesScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(20) { index ->
-                        GroupCard(title = "Note ${index + 1}")
+                        ElementCard(
+                            title = "Note ${index + 1}",
+                            onClick = { onNavigateToEditNote(null) }
+                        )
                     }
                 }
 
