@@ -132,7 +132,7 @@ fun GroupsScreen(
 
 // Group Card
 @Composable
-private fun GroupCard(title: String) {
+fun GroupCard(title: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
