@@ -5,14 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,104 +21,92 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.znotez.data.AppDatabase
-import com.example.znotez.data.model.Note
-import androidx.compose.runtime.getValue
-import kotlinx.coroutines.flow.map
-import androidx.compose.foundation.lazy.grid.items
 
 @Composable
 fun HomeScreen(
     onNavigateToGroups: () -> Unit,
-    onNavigateToNotes: () -> Unit,
-    context: android.content.Context
+    onNavigateToEditNote: () -> Unit
 ) {
-    val db = AppDatabase.getDatabase(context)
-    val dao = db.noteDao()
-
-    val notes by dao.getAllNotes()
-        .map { it.take(4) }
-        .collectAsState(initial = emptyList<Note>())
-
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
                     selected = true,
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Groups") },
-                    label = { Text("Groups") },
+                    icon = { Icon(Icons.Default.List, contentDescription = "Groups") },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "New Note") },
-                    label = { Text("Note") },
                     selected = false,
-                    onClick = onNavigateToNotes
+                    onClick = onNavigateToEditNote
                 )
             }
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(Color(0xFFF7F8FC))
-        ) {
-            Canvas(modifier = Modifier.fillMaxWidth().height(60.dp)) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background decorative line
+            // Replace only the Canvas block with this:
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFF7F8FC))
+            ) {
                 val w = size.width
                 val h = size.height
                 drawLine(
                     color = Color(0xFFC6B8FF).copy(alpha = 0.5f),
-                    start = Offset(0f, h / 3f),
-                    end = Offset(w, h * 2 / 3f),
-                    strokeWidth = 16f
+                    start = Offset(-w * 0.5f, h / 3f),      // extended to the left
+                    end = Offset(w * 1.5f, h * 2 / 3f),     // extended to the right
+                    strokeWidth = 160f
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFA8C5FF))
-                    .padding(12.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "Last Notes",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            // 2x2 Grid
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(padding)
             ) {
-                if (notes.isEmpty()) {
-                    items(4) { EmptyNoteCard() }
-                } else {
-                    items(notes) { note ->
-                        NoteCard(note = note)
+                // Title box
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFFA8C5FF))
+                        .padding(12.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Last Notes",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                    // Fill remaining slots to always show 4 cards
-                    repeat(4 - notes.size) {
-                        item { EmptyNoteCard() }
+                }
+
+                // 2x2 Grid with mock notes
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(4) { index ->
+                        NoteCard(
+                            title = "Note ${index + 1}",
+                            content = "This is a preview of the note content. It shows the beginning of the text..."
+                        )
                     }
                 }
             }
@@ -127,11 +114,9 @@ fun HomeScreen(
     }
 }
 
-// Keep NoteCard and EmptyNoteCard the same as before
-
-// Real Note Card
+// Mock Note Card
 @Composable
-private fun NoteCard(note: Note) {
+private fun NoteCard(title: String, content: String) {
     Card(
         modifier = Modifier.fillMaxWidth().aspectRatio(1f),
         shape = RoundedCornerShape(10.dp),
@@ -139,7 +124,7 @@ private fun NoteCard(note: Note) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
-                text = note.title.ifEmpty { "Untitled" },
+                text = title,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color.White,
@@ -149,26 +134,12 @@ private fun NoteCard(note: Note) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = note.content,
+                text = content,
                 color = Color.White.copy(alpha = 0.9f),
                 fontSize = 14.sp,
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
             )
-        }
-    }
-}
-
-// Empty placeholder card
-@Composable
-private fun EmptyNoteCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF).copy(alpha = 0.6f))
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No note", color = Color.White.copy(alpha = 0.5f))
         }
     }
 }

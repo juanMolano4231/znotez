@@ -41,8 +41,7 @@ fun AppNavigation() {
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToNotes = { navController.navigate(Screen.Notes.route) },
-                context = LocalContext.current
+                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
             )
         }
         composable(Screen.Groups.route) {
