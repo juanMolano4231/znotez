@@ -31,6 +31,7 @@ fun EditNoteScreen(
     onNavigateToNotes: () -> Unit
 ) {
     var text by rememberSaveable { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -82,6 +83,27 @@ fun EditNoteScreen(
                 )
             }
 
+            if (showError) {
+                AlertDialog(
+                    onDismissRequest = { showError = false },
+                    confirmButton = {
+                        Button(
+                            onClick = { showError = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8))
+                        ) {
+                            Text("Ok", color = Color.Black)
+                        }
+                    },
+                    title = {
+                        Text("Error", color = Color.Black)
+                    },
+                    text = {
+                        Text("The file could not be attached", color = Color.Black)
+                    },
+                    containerColor = Color(0xFFF6A6A6)
+                )
+            }
+
             if (!isLandscape) {
 
                 // VERTICAL (restored behavior)
@@ -96,7 +118,7 @@ fun EditNoteScreen(
 
                     Spacer(Modifier.height(12.dp))
 
-                    AttachRow()
+                    AttachRow() { showError = true }
 
                     Spacer(Modifier.height(12.dp))
 
@@ -136,8 +158,8 @@ fun EditNoteScreen(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                AttachButton(Icons.Default.AddPhotoAlternate, 60.dp)
-                                AttachButton(Icons.Default.AudioFile, 60.dp)
+                                AttachButton(Icons.Default.AddPhotoAlternate, 60.dp) { showError = true }
+                                AttachButton(Icons.Default.AudioFile, 60.dp) { showError = true }
                             }
                         }
 
@@ -204,14 +226,14 @@ private fun Title() {
 }
 
 @Composable
-private fun AttachRow() {
+private fun AttachRow(onAttachClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            AttachButton(Icons.Default.AddPhotoAlternate)
-            AttachButton(Icons.Default.AudioFile)
+            AttachButton(Icons.Default.AddPhotoAlternate, onClick = onAttachClick)
+            AttachButton(Icons.Default.AudioFile, onClick = onAttachClick)
         }
     }
 }
@@ -219,13 +241,15 @@ private fun AttachRow() {
 @Composable
 private fun AttachButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    size: Dp = 80.dp
+    size: Dp = 80.dp,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(size)
             .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFFAEE6D8)),
+            .background(Color(0xFFAEE6D8))
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, null)
