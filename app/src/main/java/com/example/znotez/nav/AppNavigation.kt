@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.znotez.data.group.GroupRepository
 import com.example.znotez.screens.EditGroupScreen
 import com.example.znotez.screens.EditNoteScreen
 import com.example.znotez.screens.GroupsScreen
@@ -61,15 +62,30 @@ fun AppNavigation() {
         }
         composable(
             route = Screen.EditGroup.route,
-            arguments = listOf(navArgument("groupId") { type = NavType.StringType; nullable = true })
+            arguments = listOf(
+                navArgument("groupId") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
+            )
         ) { backStackEntry ->
-            val groupId = backStackEntry.arguments?.getString("groupId")
+
+
+            val context = LocalContext.current
+            val repository = GroupRepository(context)
+
+            val groupId = backStackEntry.arguments?.getLong("groupId") ?: -1L
+
             EditGroupScreen(
+                groupId = groupId,
+                repository = repository,
                 onSave = { navController.popBackStack() },
                 onCancel = { navController.popBackStack() },
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
+                onNavigateToEditNote = { noteId ->
+                    navController.navigate("edit_note/$noteId")
+                }
             )
         }
         composable(

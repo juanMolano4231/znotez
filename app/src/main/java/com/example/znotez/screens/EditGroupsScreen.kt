@@ -37,7 +37,7 @@ fun EditGroupScreen(
     repository: GroupRepository,
     onNavigateToHome: () -> Unit,
     onNavigateToGroups: () -> Unit,
-    onNavigateToEditNote: () -> Unit,
+    onNavigateToEditNote: (Long) -> Unit,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -69,7 +69,7 @@ fun EditGroupScreen(
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.NoteAdd, null) },
                     selected = true,
-                    onClick = onNavigateToEditNote
+                    onClick = { onNavigateToEditNote(-1L) }
                 )
             }
         }
