@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +54,7 @@ fun NotesScreen(
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
                     selected = true,
-                    onClick =  { onNavigateToEditNote(null) }
+                    onClick = { onNavigateToEditNote(null) }
                 )
             }
         }
@@ -76,80 +77,171 @@ fun NotesScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
+            val isLandscape =
+                LocalConfiguration.current.orientation ==
+                        android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                // Title
-                Box(
+            if (!isLandscape) {
+
+
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFA8C5FF))
-                        .padding(12.dp)
+                        .fillMaxSize()
+                        .padding(padding)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Folder, contentDescription = null, tint = Color.White)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "Construction",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+
+                    // Title
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFFA8C5FF))
+                            .padding(12.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Folder, null, tint = Color.White)
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Construction",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Grid
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(20) { index ->
+                            NoteCard(
+                                title = "Note ${index + 1}",
+                                onClick = { onNavigateToEditNote(null) }
+                            )
+                        }
+                    }
+
+                    // Buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Button(
+                            onClick = { onNavigateToEditNote(null) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.NoteAdd, null, tint = Color.Black)
+                        }
+
+                        Button(
+                            onClick = onNavigateToGroups,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.DeleteForever, null)
+                        }
                     }
                 }
 
-                // Notes grid (mock)
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(20) { index ->
-                        NoteCard(
-                            title = "Note ${index + 1}",
-                            onClick = { onNavigateToEditNote(null) }
-                        )
-                    }
-                }
 
-                // Two buttons row
+            } else {
+
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp)
                 ) {
 
-                    // Left button (Edit Note)
-                    Button(
-                        onClick = { onNavigateToEditNote(null) },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
-                        shape = RoundedCornerShape(10.dp),
+                    // LEFT COLUMN
+                    Column(
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Icon(Icons.Default.NoteAdd, contentDescription = "New Note", tint = Color.Black)
+
+                        // Red button (top-left)
+                        Button(
+                            onClick = onNavigateToGroups,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        ) {
+                            Icon(Icons.Default.DeleteForever, null)
+                        }
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Green button (row 3, col 1)
+                        Button(
+                            onClick = { onNavigateToEditNote(null) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        ) {
+                            Icon(Icons.Default.NoteAdd, null, tint = Color.Black)
+                        }
                     }
 
-                    // Right button (Go to Groups)
-                    Button(
-                        onClick = onNavigateToGroups,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
-                        shape = RoundedCornerShape(10.dp),
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    // MIDDLE + RIGHT (2 columns merged)
+                    Column(
                         modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp)
+                            .weight(2f)
+                            .fillMaxHeight()
                     ) {
-                        Icon(Icons.Default.DeleteForever, contentDescription = "Groups", tint = Color.Black)
+
+                        // Title (spans 2 columns visually)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFA8C5FF))
+                                .padding(12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Folder, null, tint = Color.White)
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Construction",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Grid: 2 columns, ~3 visible rows
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(20) { index ->
+                                NoteCard(
+                                    title = "Note ${index + 1}",
+                                    onClick = { onNavigateToEditNote(null) }
+                                )
+                            }
+                        }
                     }
                 }
             }
