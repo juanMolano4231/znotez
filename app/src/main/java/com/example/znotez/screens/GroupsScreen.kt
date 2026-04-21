@@ -1,5 +1,6 @@
 package com.example.znotez.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,8 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.BoxWithConstraints
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun GroupsScreen(
     onNavigateToHome: () -> Unit,
@@ -38,17 +38,17 @@ fun GroupsScreen(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(Icons.Default.Home, null) },
                     selected = false,
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, null) },
                     selected = true,
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = "New Note") },
+                    icon = { Icon(Icons.AutoMirrored.Filled.NoteAdd, null) },
                     selected = false,
                     onClick = onNavigateToEditNote
                 )
@@ -56,7 +56,7 @@ fun GroupsScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            // Background decorative line (lower part)
+
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -72,69 +72,107 @@ fun GroupsScreen(
                 )
             }
 
-            Column(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                // Title box
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFA8C5FF))
-                        .padding(12.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.ViewCozy, contentDescription = null, tint = Color.White)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "Groups",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                val isLandscape = maxWidth > maxHeight
+                val columns = if (isLandscape) 3 else 2
 
-                // Lazy grid of group cards (2 columns)
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(20) { index ->
-                        GroupCard(
-                            title = "Group ${index + 1}",
-                            onClick = { onNavigateToNotes() }
-                        )
-                    }
-                }
+                Column(modifier = Modifier.fillMaxSize()) {
 
-                // Centered button to create new group
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Button(
-                        onClick = onNavigateToEditGroup,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
-                        shape = RoundedCornerShape(10.dp),
+                    if (isLandscape) {
+                        // Top row: title (2/3) + button (1/3)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+
+                            // Title (2 columns)
+                            Box(
+                                modifier = Modifier
+                                    .weight(2f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFFA8C5FF))
+                                    .padding(12.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.ViewCozy, null, tint = Color.White)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Groups", color = Color.White, fontSize = 20.sp)
+                                }
+                            }
+
+                            // Button (1 column)
+                            Button(
+                                onClick = onNavigateToEditGroup,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                            ) {
+                                Icon(Icons.Default.CreateNewFolder, null, tint = Color.Black)
+                            }
+                        }
+                    } else {
+                        // Portrait title
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFA8C5FF))
+                                .padding(12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.ViewCozy, null, tint = Color.White)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Groups", color = Color.White, fontSize = 20.sp)
+                            }
+                        }
+                    }
+
+                    // Grid
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(columns),
                         modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .height(56.dp)
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.CreateNewFolder,
-                            contentDescription = "New Group",
-                            tint = Color.Black
-                        )
+                        items(20) { index ->
+                            GroupCard(
+                                title = "Group ${index + 1}",
+                                isLandscape = isLandscape,
+                                onClick = { onNavigateToNotes() }
+                            )
+                        }
+                    }
+
+                    if (!isLandscape) {
+                        // Portrait button
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Button(
+                                onClick = onNavigateToEditGroup,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth(0.4f)
+                                    .height(56.dp)
+                            ) {
+                                Icon(Icons.Default.CreateNewFolder, null, tint = Color.Black)
+                            }
+                        }
                     }
                 }
             }
@@ -142,16 +180,19 @@ fun GroupsScreen(
     }
 }
 
-
 @Composable
 fun GroupCard(
     title: String,
+    isLandscape: Boolean,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .then(
+                if (isLandscape) Modifier.height(60.dp)
+                else Modifier.height(80.dp)
+            )
             .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF))
@@ -160,7 +201,7 @@ fun GroupCard(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.Folder, contentDescription = null, tint = Color.White)
+            Icon(Icons.Default.Folder, null, tint = Color.White)
             Spacer(modifier = Modifier.width(12.dp))
             Text(text = title, color = Color.White)
         }
