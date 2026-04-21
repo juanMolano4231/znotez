@@ -5,8 +5,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.AudioFile
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.NoteAdd
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +32,8 @@ fun EditNoteScreen(
     onCancel: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToGroups: () -> Unit,
-    onNavigateToEditNote: () -> Unit
+    onNavigateToEditNote: () -> Unit,
+    onNavigateToNotes: () -> Unit
 ) {
     var text by remember { mutableStateOf("") }
 
@@ -32,17 +41,17 @@ fun EditNoteScreen(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, null) },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     selected = false,
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, null) },
+                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, null) },
+                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
                     selected = true,
                     onClick = onNavigateToEditNote
                 )
@@ -93,7 +102,7 @@ fun EditNoteScreen(
                         .padding(12.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Home, null, tint = Color.White)
+                        Icon(Icons.Default.EditNote, null, tint = Color.White)
                         Spacer(Modifier.width(8.dp))
                         Text("Edit Note", color = Color.White, fontSize = 20.sp)
                     }
@@ -102,25 +111,31 @@ fun EditNoteScreen(
                 Spacer(Modifier.height(12.dp))
 
                 // Attach buttons
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFFAEE6D8)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Home, null)
-                    }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFFAEE6D8)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Home, null)
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFAEE6D8)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.AddPhotoAlternate, null)
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFAEE6D8)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.AudioFile, null)
+                        }
                     }
                 }
 
@@ -135,11 +150,11 @@ fun EditNoteScreen(
                         .padding(12.dp)
                 ) {
 
-                    // Text field (scrollable)
+                    // Text field grows
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
+                            .weight(1f)   // key change
                             .clip(RoundedCornerShape(10.dp))
                             .background(Color(0xFFAEE6D8))
                             .verticalScroll(rememberScrollState())
@@ -156,11 +171,12 @@ fun EditNoteScreen(
                         )
                     }
 
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(8.dp))
 
                     // Attachments (scrollable)
                     Row(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .horizontalScroll(rememberScrollState())
                     ) {
 
@@ -220,22 +236,28 @@ fun EditNoteScreen(
                 // Bottom buttons
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
-                        onClick = onCancel,
+                        onClick = onNavigateToNotes,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
                         modifier = Modifier.weight(1f)
-                    ) { }
+                    ) {
+                        Icon(Icons.Default.Save, null)
+                    }
 
                     Button(
-                        onClick = onSave,
+                        onClick = onNavigateToNotes,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
                         modifier = Modifier.weight(1f)
-                    ) { }
+                    ) {
+                        Icon(Icons.Default.DeleteForever, null)
+                    }
 
                     Button(
-                        onClick = onSave,
+                        onClick = onNavigateToNotes,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
                         modifier = Modifier.weight(1f)
-                    ) { }
+                    ) {
+                        Icon(Icons.Default.Cancel, null)
+                    }
                 }
             }
         }
