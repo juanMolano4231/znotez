@@ -46,9 +46,12 @@ fun EditGroupScreen(
 
     // Load existing group (edit mode)
     LaunchedEffect(groupId) {
-        if (groupId != -1L && !initialized) {
+        if (groupId != -1L) {
             val group = repository.getById(groupId)
             groupName = group?.name ?: ""
+            initialized = true
+        } else {
+            groupName = ""
             initialized = true
         }
     }

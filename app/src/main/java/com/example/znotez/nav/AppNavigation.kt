@@ -16,15 +16,18 @@ import com.example.znotez.screens.NotesScreen
 import com.example.znotez.screens.SplashScreen
 
 sealed class Screen(val route: String) {
+
     object Splash : Screen("splash")
     object Home : Screen("home")
     object Groups : Screen("groups")
     object Notes : Screen("notes")
-    object EditGroup : Screen("edit_group?groupId={groupId}") {
-        fun createRoute(groupId: String? = null) = "edit_group?groupId=$groupId"
+
+    object EditGroup : Screen("edit_group/{groupId}") {
+        fun createRoute(groupId: Long) = "edit_group/$groupId"
     }
-    object EditNote : Screen("edit_note?noteId={noteId}") {
-        fun createRoute(noteId: String? = null) = "edit_note?noteId=$noteId"
+
+    object EditNote : Screen("edit_note/{noteId}") {
+        fun createRoute(noteId: Long) = "edit_note/$noteId"
     }
 }
 
@@ -36,30 +39,48 @@ fun AppNavigation() {
         navController = navController,
         startDestination = Screen.Splash.route
     ) {
+
         composable(Screen.Splash.route) {
-            SplashScreen(onNavigateToHome = { navController.navigate(Screen.Home.route) })
+            SplashScreen(
+                onNavigateToHome = { navController.navigate(Screen.Home.route) }
+            )
         }
+
         composable(Screen.Home.route) {
             HomeScreen(
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
+                onNavigateToEditNote = { navController.navigate(Screen.EditNote.createRoute(-1L)) }
             )
         }
+
         composable(Screen.Groups.route) {
+
+            val context = LocalContext.current
+            val repository = GroupRepository(context)
+
             GroupsScreen(
+                repository = repository,
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
-                onNavigateToEditGroup = { navController.navigate(Screen.EditGroup.createRoute(null)) } ,
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) },
-                onNavigateToNotes = { navController.navigate(Screen.Notes.route) },
+                onNavigateToEditGroup = { id ->
+                    navController.navigate(Screen.EditGroup.createRoute(id))
+                },
+                onNavigateToEditNote = {
+                    navController.navigate(Screen.EditNote.createRoute(-1L))
+                },
+                onNavigateToNotes = { navController.navigate(Screen.Notes.route) }
             )
         }
+
         composable(Screen.Notes.route) {
             NotesScreen(
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) }
+                onNavigateToEditNote = {
+                    navController.navigate(Screen.EditNote.createRoute(-1L))
+                }
             )
         }
+
         composable(
             route = Screen.EditGroup.route,
             arguments = listOf(
@@ -69,7 +90,6 @@ fun AppNavigation() {
                 }
             )
         ) { backStackEntry ->
-
 
             val context = LocalContext.current
             val repository = GroupRepository(context)
@@ -84,23 +104,33 @@ fun AppNavigation() {
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
                 onNavigateToEditNote = { noteId ->
-                    navController.navigate("edit_note/$noteId")
+                    navController.navigate(Screen.EditNote.createRoute(noteId))
                 }
             )
         }
+
         composable(
             route = Screen.EditNote.route,
-            arguments = listOf(navArgument("noteId") { type = NavType.StringType; nullable = true })
+            arguments = listOf(
+                navArgument("noteId") {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                }
+            )
         ) { backStackEntry ->
-            val noteId = backStackEntry.arguments?.getString("noteId")
+
+            val noteId = backStackEntry.arguments?.getLong("noteId") ?: -1L
+
             EditNoteScreen(
                 noteId = noteId,
                 onSave = { navController.popBackStack() },
                 onCancel = { navController.popBackStack() },
                 onNavigateToHome = { navController.navigate(Screen.Home.route) },
                 onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
-                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) },
-                onNavigateToNotes = { navController.navigate(Screen.Notes.route) },
+                onNavigateToEditNote = { id ->
+                    navController.navigate(Screen.EditNote.createRoute(id))
+                },
+                onNavigateToNotes = { navController.navigate(Screen.Notes.route) }
             )
         }
     }
