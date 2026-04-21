@@ -1,7 +1,6 @@
 package com.example.znotez.screens
 
-import androidx.compose.material.icons.filled.NoteAdd
-
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,8 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LibraryBooks
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -27,7 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.BoxWithConstraints
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun HomeScreen(
     onNavigateToGroups: () -> Unit,
@@ -55,6 +55,7 @@ fun HomeScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
+
             // Background decorative line
             Canvas(
                 modifier = Modifier
@@ -65,53 +66,67 @@ fun HomeScreen(
                 val h = size.height
                 drawLine(
                     color = Color(0xFFC6B8FF).copy(alpha = 0.5f),
-                    start = Offset(-w * 0.5f, h / 3f),      // extended to the left
-                    end = Offset(w * 1.5f, h * 2 / 3f),     // extended to the right
+                    start = Offset(-w * 0.5f, h / 3f),
+                    end = Offset(w * 1.5f, h * 2 / 3f),
                     strokeWidth = 160f
                 )
             }
 
-            Column(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
-                // Title box
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFA8C5FF))
-                        .padding(12.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.AutoMirrored.Filled.LibraryBooks, contentDescription = null, tint = Color.White)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "Last Notes",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                val isLandscape = maxWidth > maxHeight
+                val columns = if (isLandscape) 4 else 2
+                val cardRatio = if (isLandscape) 2f else 1f
 
-                // 2x2 Grid with mock notes
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    items(4) { index ->
-                        NoteCard(
-                            title = "Note ${index + 1}",
-                            content = "This is a preview of the note content. It shows the beginning of the text...",
-                            onClick = { onNavigateToEditNote() }
-                        )
+
+                    // Title box
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFFA8C5FF))
+                            .padding(12.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.LibraryBooks,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Last Notes",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Responsive grid
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(columns),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(4) { index ->
+                            NoteCard(
+                                title = "Note ${index + 1}",
+                                content = "This is a preview of the note content. It shows the beginning of the text...",
+                                aspectRatio = cardRatio,
+                                onClick = { onNavigateToEditNote() }
+                            )
+                        }
                     }
                 }
             }
@@ -119,17 +134,17 @@ fun HomeScreen(
     }
 }
 
-// Mock Note Card
 @Composable
 private fun NoteCard(
     title: String,
     content: String,
+    aspectRatio: Float,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
+            .aspectRatio(aspectRatio)
             .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF))
@@ -148,7 +163,7 @@ private fun NoteCard(
                 text = content,
                 color = Color.White.copy(alpha = 0.9f),
                 fontSize = 14.sp,
-                maxLines = 4,
+                maxLines = if (aspectRatio > 1f) 2 else 4,
                 overflow = TextOverflow.Ellipsis
             )
         }
