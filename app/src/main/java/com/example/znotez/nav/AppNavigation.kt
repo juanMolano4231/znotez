@@ -80,7 +80,11 @@ fun AppNavigation() {
             EditNoteScreen(
                 noteId = noteId,
                 onSave = { navController.popBackStack() },
-                onCancel = { navController.popBackStack() }
+                onCancel = { navController.popBackStack() },
+                onNavigateToHome = { navController.navigate(Screen.Home.route) },
+                onNavigateToGroups = { navController.navigate(Screen.Groups.route) },
+                onNavigateToEditNote = { navController.navigate(Screen.EditNote.route) },
+                onNavigateToNotes = { navController.navigate(Screen.Notes.route) },
             )
         }
     }
