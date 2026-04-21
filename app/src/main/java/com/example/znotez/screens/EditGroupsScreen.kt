@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,10 +27,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.znotez.data.group.GroupRepository
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun EditGroupScreen(
+    groupId: Long,
+    repository: GroupRepository,
     onNavigateToHome: () -> Unit,
     onNavigateToGroups: () -> Unit,
     onNavigateToEditNote: () -> Unit,
@@ -37,30 +42,41 @@ fun EditGroupScreen(
     onCancel: () -> Unit
 ) {
     var groupName by rememberSaveable { mutableStateOf("") }
+    var initialized by remember { mutableStateOf(false) }
+
+    // Load existing group (edit mode)
+    LaunchedEffect(groupId) {
+        if (groupId != -1L && !initialized) {
+            val group = repository.getById(groupId)
+            groupName = group?.name ?: ""
+            initialized = true
+        }
+    }
 
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(Icons.Default.Home, null) },
                     selected = false,
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, null) },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
+                    icon = { Icon(Icons.Default.NoteAdd, null) },
                     selected = true,
-                    onClick =  { onNavigateToEditNote() }
+                    onClick = onNavigateToEditNote
                 )
             }
         }
     ) { padding ->
+
         Box(modifier = Modifier.fillMaxSize()) {
-            // Decorative line: from bottom center to top right
+
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -96,7 +112,6 @@ fun EditGroupScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
 
-                        // Editable Group Name Field
                         OutlinedTextField(
                             value = groupName,
                             onValueChange = { groupName = it },
@@ -104,11 +119,16 @@ fun EditGroupScreen(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(Color(0xFFA8C5FF)),
-                            textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 18.sp),
+                            textStyle = LocalTextStyle.current.copy(
+                                color = Color.White,
+                                fontSize = 18.sp
+                            ),
                             leadingIcon = {
                                 Icon(Icons.Default.Folder, null, tint = Color.White)
                             },
-                            placeholder = { Text("Group name", color = Color.White.copy(alpha = 0.7f)) },
+                            placeholder = {
+                                Text("Group name", color = Color.White.copy(alpha = 0.7f))
+                            },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = Color.Transparent,
@@ -122,20 +142,40 @@ fun EditGroupScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+
+                            // SAVE / CREATE
                             Button(
-                                onClick = onCancel,
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.weight(1f).height(56.dp)
+                                onClick = {
+                                    if (groupName.isNotBlank()) {
+                                        if (groupId == -1L) {
+                                            // create
+                                            kotlinx.coroutines.GlobalScope.launch {
+                                                repository.create(groupName)
+                                            }
+                                        } else {
+                                            // update
+                                            kotlinx.coroutines.GlobalScope.launch {
+                                                repository.update(groupId, groupName)
+                                            }
+                                        }
+                                        onSave()
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(Color(0xFFAEE6D8)),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
                             ) {
                                 Icon(Icons.Default.CreateNewFolder, null, tint = Color.Black)
                             }
 
+                            // CANCEL
                             Button(
-                                onClick = onSave,
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.weight(1f).height(56.dp)
+                                onClick = onCancel,
+                                colors = ButtonDefaults.buttonColors(Color(0xFFF4A6A6)),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
                             ) {
                                 Icon(Icons.Default.Cancel, null, tint = Color.White)
                             }
