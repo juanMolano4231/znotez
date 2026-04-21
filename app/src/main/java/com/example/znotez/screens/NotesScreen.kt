@@ -3,12 +3,18 @@ package com.example.znotez.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.NoteAdd
+import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.znotez.shared.ElementCard
 
 
 @Composable
@@ -41,14 +46,14 @@ fun NotesScreen(
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "New Note") },
+                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
                     selected = true,
-                    onClick = { onNavigateToEditNote(null) }
+                    onClick =  { onNavigateToEditNote(null) }
                 )
             }
         }
@@ -87,10 +92,10 @@ fun NotesScreen(
                         .padding(12.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.Folder, contentDescription = null, tint = Color.White)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Notes",
+                            text = "Construction",
                             color = Color.White,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
@@ -108,7 +113,7 @@ fun NotesScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(20) { index ->
-                        ElementCard(
+                        NoteCard(
                             title = "Note ${index + 1}",
                             onClick = { onNavigateToEditNote(null) }
                         )
@@ -132,7 +137,7 @@ fun NotesScreen(
                             .weight(1f)
                             .height(56.dp)
                     ) {
-                        Icon(Icons.Default.Home, contentDescription = "New Note", tint = Color.Black)
+                        Icon(Icons.Default.NoteAdd, contentDescription = "New Note", tint = Color.Black)
                     }
 
                     // Right button (Go to Groups)
@@ -144,10 +149,35 @@ fun NotesScreen(
                             .weight(1f)
                             .height(56.dp)
                     ) {
-                        Icon(Icons.Default.Home, contentDescription = "Groups", tint = Color.Black)
+                        Icon(Icons.Default.DeleteForever, contentDescription = "Groups", tint = Color.Black)
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun NoteCard(
+    title: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.FileOpen, contentDescription = null, tint = Color.White)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = title, color = Color.White)
         }
     }
 }
