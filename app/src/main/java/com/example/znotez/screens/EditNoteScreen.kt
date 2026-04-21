@@ -1,27 +1,22 @@
 package com.example.znotez.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.AudioFile
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.NoteAdd
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.ViewCozy
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -35,32 +30,35 @@ fun EditNoteScreen(
     onNavigateToEditNote: () -> Unit,
     onNavigateToNotes: () -> Unit
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf("") }
+
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(Icons.Default.Home, null) },
                     selected = false,
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, null) },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
+                    icon = { Icon(Icons.Default.NoteAdd, null) },
                     selected = true,
                     onClick = onNavigateToEditNote
                 )
             }
         }
     ) { padding ->
+
         Box(Modifier.fillMaxSize()) {
 
-            // Background lines
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -69,7 +67,6 @@ fun EditNoteScreen(
                 val w = size.width
                 val h = size.height
 
-                // Line 1
                 drawLine(
                     color = Color(0xFFC6B8FF).copy(alpha = 0.5f),
                     start = Offset(w * 0.25f, 0f),
@@ -77,7 +74,6 @@ fun EditNoteScreen(
                     strokeWidth = 140f
                 )
 
-                // Line 2
                 drawLine(
                     color = Color(0xFFC6B8FF).copy(alpha = 0.5f),
                     start = Offset(0f, h * 0.33f),
@@ -86,180 +82,277 @@ fun EditNoteScreen(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp)
-            ) {
+            if (!isLandscape) {
 
-                // Title
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFA8C5FF))
-                        .padding(12.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.EditNote, null, tint = Color.White)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Edit Note", color = Color.White, fontSize = 20.sp)
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Attach buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFFAEE6D8)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.AddPhotoAlternate, null)
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFFAEE6D8)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.AudioFile, null)
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                // Main content box
+                // VERTICAL (restored behavior)
                 Column(
                     modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFC6B8FF))
-                        .padding(12.dp)
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp)
                 ) {
 
-                    // Text field grows
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)   // key change
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFFAEE6D8))
-                            .verticalScroll(rememberScrollState())
-                            .padding(8.dp)
-                    ) {
-                        TextField(
-                            value = text,
-                            onValueChange = { text = it },
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent
-                            ),
-                            modifier = Modifier.fillMaxSize()
-                        )
+                    Title()
+
+                    Spacer(Modifier.height(12.dp))
+
+                    AttachRow()
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Box(modifier = Modifier.weight(1f)) {
+                        ContentBox(text) { text = it }
                     }
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(12.dp))
 
-                    // Attachments (scrollable)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState())
-                    ) {
-
-                        // Mock image
-                        Box(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.Gray)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .background(Color.White.copy(alpha = 0.7f))
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    null,
-                                    modifier = Modifier.align(Alignment.CenterEnd)
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.width(8.dp))
-
-                        // Mock audio
-                        Box(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFFAEE6D8)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("audio.mp3")
-
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .background(Color.White.copy(alpha = 0.7f))
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    null,
-                                    modifier = Modifier.align(Alignment.CenterEnd)
-                                )
-                            }
-                        }
-                    }
+                    BottomButtons(
+                        onSave = onNavigateToNotes,
+                        onDelete = onNavigateToNotes,
+                        onCancel = onNavigateToNotes
+                    )
                 }
 
-                Spacer(Modifier.height(12.dp))
+            } else {
 
-                // Bottom buttons
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        onClick = onNavigateToNotes,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
-                        modifier = Modifier.weight(1f)
+                // LANDSCAPE
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Icon(Icons.Default.Save, null)
+
+                        // Centered attach buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                AttachButton(Icons.Default.AddPhotoAlternate, 60.dp)
+                                AttachButton(Icons.Default.AudioFile, 60.dp)
+                            }
+                        }
+
+                        Button(
+                            onClick = onNavigateToNotes,
+                            colors = ButtonDefaults.buttonColors(Color(0xFFAEE6D8)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                        ) { Icon(Icons.Default.Save, null) }
+
+                        Button(
+                            onClick = onNavigateToNotes,
+                            colors = ButtonDefaults.buttonColors(Color(0xFFF4A6A6)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                        ) { Icon(Icons.Default.Cancel, null) }
+
+                        Button(
+                            onClick = onNavigateToNotes,
+                            colors = ButtonDefaults.buttonColors(Color(0xFFF4A6A6)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                        ) { Icon(Icons.Default.DeleteForever, null) }
                     }
 
-                    Button(
-                        onClick = onNavigateToNotes,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Default.DeleteForever, null)
-                    }
+                    Spacer(Modifier.width(12.dp))
 
-                    Button(
-                        onClick = onNavigateToNotes,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
-                        modifier = Modifier.weight(1f)
+                    Column(
+                        modifier = Modifier
+                            .weight(2f)
+                            .fillMaxHeight()
                     ) {
-                        Icon(Icons.Default.Cancel, null)
+
+                        Title()
+
+                        Spacer(Modifier.height(8.dp))
+
+                        ContentBox(text) { text = it }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun Title() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFFA8C5FF))
+            .padding(12.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.EditNote, null, tint = Color.White)
+            Spacer(Modifier.width(8.dp))
+            Text("Edit Note", color = Color.White, fontSize = 20.sp)
+        }
+    }
+}
+
+@Composable
+private fun AttachRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            AttachButton(Icons.Default.AddPhotoAlternate)
+            AttachButton(Icons.Default.AudioFile)
+        }
+    }
+}
+
+@Composable
+private fun AttachButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    size: Dp = 80.dp
+) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFFAEE6D8)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(icon, null)
+    }
+}
+
+@Composable
+private fun ContentBox(
+    text: String,
+    onTextChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFFC6B8FF))
+            .padding(12.dp)
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color(0xFFAEE6D8))
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp)
+        ) {
+            TextField(
+                value = text,
+                onValueChange = onTextChange,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                ),
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+
+            val mediaSize = 70.dp
+            val overlayHeight = 28.dp
+
+            Box(
+                modifier = Modifier
+                    .size(mediaSize)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Gray)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .height(overlayHeight)
+                        .background(Color.White.copy(alpha = 0.7f))
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        null,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .size(16.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(6.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(mediaSize)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFFAEE6D8)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("audio.mp3", fontSize = 10.sp)
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .height(overlayHeight)
+                        .background(Color.White.copy(alpha = 0.7f))
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        null,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomButtons(
+    onSave: () -> Unit,
+    onDelete: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Button(
+            onClick = onSave,
+            colors = ButtonDefaults.buttonColors(Color(0xFFAEE6D8)),
+            modifier = Modifier.weight(1f)
+        ) { Icon(Icons.Default.Save, null) }
+
+        Button(
+            onClick = onDelete,
+            colors = ButtonDefaults.buttonColors(Color(0xFFF4A6A6)),
+            modifier = Modifier.weight(1f)
+        ) { Icon(Icons.Default.DeleteForever, null) }
+
+        Button(
+            onClick = onCancel,
+            colors = ButtonDefaults.buttonColors(Color(0xFFF4A6A6)),
+            modifier = Modifier.weight(1f)
+        ) { Icon(Icons.Default.Cancel, null) }
     }
 }
