@@ -5,7 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CreateNewFolder
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.NoteAdd
+import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,14 +44,14 @@ fun EditGroupScreen(
                     onClick = onNavigateToHome
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "New Note") },
-                    selected = false,
-                    onClick = onNavigateToEditNote
+                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
+                    selected = true,
+                    onClick =  { onNavigateToEditNote() }
                 )
             }
         }
@@ -85,7 +90,7 @@ fun EditGroupScreen(
                         .background(Color(0xFFA8C5FF)),
                     textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 18.sp),
                     leadingIcon = {
-                        Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.Folder, contentDescription = null, tint = Color.White)
                     },
                     placeholder = { Text("Group name", color = Color.White.copy(alpha = 0.7f)) },
                     singleLine = true,
@@ -108,7 +113,7 @@ fun EditGroupScreen(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.weight(1f).height(56.dp)
                     ) {
-                        Icon(Icons.Default.Home, contentDescription = "Cancel", tint = Color.Black)
+                        Icon(Icons.Default.CreateNewFolder, contentDescription = "Cancel", tint = Color.Black)
                     }
 
                     Button(
@@ -117,7 +122,7 @@ fun EditGroupScreen(
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.weight(1f).height(56.dp)
                     ) {
-                        Icon(Icons.Default.Home, contentDescription = "Save", tint = Color.White)
+                        Icon(Icons.Default.Cancel, contentDescription = "Save", tint = Color.White)
                     }
                 }
             }
