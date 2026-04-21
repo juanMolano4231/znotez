@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.ViewCozy
@@ -100,7 +101,7 @@ fun NotesScreen(
                             .padding(12.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Folder, null, tint = Color.White)
+                            Icon(Icons.Default.FolderOpen, null, tint = Color.White)
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "Construction",
@@ -216,7 +217,7 @@ fun NotesScreen(
                                 .padding(12.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Folder, null, tint = Color.White)
+                                Icon(Icons.Default.FolderOpen, null, tint = Color.White)
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "Construction",
