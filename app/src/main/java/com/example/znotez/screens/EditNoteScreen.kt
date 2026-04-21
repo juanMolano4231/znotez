@@ -22,12 +22,12 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun EditNoteScreen(
-    noteId: String?,
+    noteId: Long,
     onSave: () -> Unit,
     onCancel: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToGroups: () -> Unit,
-    onNavigateToEditNote: () -> Unit,
+    onNavigateToEditNote: (Long) -> Unit,
     onNavigateToNotes: () -> Unit
 ) {
     var text by rememberSaveable { mutableStateOf("") }
@@ -52,7 +52,7 @@ fun EditNoteScreen(
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.NoteAdd, null) },
                     selected = true,
-                    onClick = onNavigateToEditNote
+                    onClick = { onNavigateToEditNote(-1L) }
                 )
             }
         }

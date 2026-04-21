@@ -37,7 +37,7 @@ fun EditGroupScreen(
     repository: GroupRepository,
     onNavigateToHome: () -> Unit,
     onNavigateToGroups: () -> Unit,
-    onNavigateToEditNote: () -> Unit,
+    onNavigateToEditNote: (Long) -> Unit,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -46,9 +46,12 @@ fun EditGroupScreen(
 
     // Load existing group (edit mode)
     LaunchedEffect(groupId) {
-        if (groupId != -1L && !initialized) {
+        if (groupId != -1L) {
             val group = repository.getById(groupId)
             groupName = group?.name ?: ""
+            initialized = true
+        } else {
+            groupName = ""
             initialized = true
         }
     }
@@ -69,7 +72,7 @@ fun EditGroupScreen(
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.NoteAdd, null) },
                     selected = true,
-                    onClick = onNavigateToEditNote
+                    onClick = { onNavigateToEditNote(-1L) }
                 )
             }
         }

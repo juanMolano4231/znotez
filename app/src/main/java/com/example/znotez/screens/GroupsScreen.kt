@@ -25,15 +25,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.BoxWithConstraints
+import com.example.znotez.data.group.GroupRepository
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun GroupsScreen(
+    repository: GroupRepository,
     onNavigateToHome: () -> Unit,
-    onNavigateToEditGroup: () -> Unit,
+    onNavigateToEditGroup: (Long) -> Unit,
     onNavigateToEditNote: () -> Unit,
-    onNavigateToNotes: () -> Unit
+    onNavigateToNotes: (Long) -> Unit
 ) {
+    val groups by repository.getAll().collectAsState(initial = emptyList())
+
     Scaffold(
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFA8C5FF)) {
@@ -108,7 +114,7 @@ fun GroupsScreen(
 
                             // Button (1 column)
                             Button(
-                                onClick = onNavigateToEditGroup,
+                                onClick = { onNavigateToEditGroup(-1L) },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
                                 shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier
@@ -145,12 +151,25 @@ fun GroupsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(20) { index ->
-                            GroupCard(
-                                title = "Group ${index + 1}",
-                                isLandscape = isLandscape,
-                                onClick = { onNavigateToNotes() }
-                            )
+                        if (groups.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("No groups", color = Color.Gray)
+                                }
+                            }
+                        } else {
+                            items(groups) { group ->
+                                GroupCard(
+                                    title = group.name,
+                                    isLandscape = isLandscape,
+                                    onClick = { onNavigateToNotes(group.id) }
+                                )
+                            }
                         }
                     }
 
@@ -163,7 +182,7 @@ fun GroupsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Button(
-                                onClick = onNavigateToEditGroup,
+                                onClick = { onNavigateToEditGroup(-1L) },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
                                 shape = RoundedCornerShape(10.dp),
                                 modifier = Modifier
