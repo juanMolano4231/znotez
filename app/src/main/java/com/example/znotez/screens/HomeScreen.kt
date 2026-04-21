@@ -1,15 +1,21 @@
 package com.example.znotez.screens
 
+import androidx.compose.material.icons.filled.NoteAdd
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.ViewCozy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,12 +42,12 @@ fun HomeScreen(
                     onClick = { }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.List, contentDescription = "Groups") },
+                    icon = { Icon(Icons.Default.ViewCozy, contentDescription = "Groups") },
                     selected = false,
                     onClick = onNavigateToGroups
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "New Note") },
+                    icon = { Icon(Icons.Default.NoteAdd, contentDescription = "New Note") },
                     selected = false,
                     onClick = onNavigateToEditNote
                 )
@@ -50,8 +56,6 @@ fun HomeScreen(
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             // Background decorative line
-            // Replace only the Canvas block with this:
-
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -82,7 +86,7 @@ fun HomeScreen(
                         .padding(12.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Home, contentDescription = null, tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.LibraryBooks, contentDescription = null, tint = Color.White)
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Last Notes",
@@ -105,7 +109,8 @@ fun HomeScreen(
                     items(4) { index ->
                         NoteCard(
                             title = "Note ${index + 1}",
-                            content = "This is a preview of the note content. It shows the beginning of the text..."
+                            content = "This is a preview of the note content. It shows the beginning of the text...",
+                            onClick = { onNavigateToEditNote() }
                         )
                     }
                 }
@@ -116,9 +121,16 @@ fun HomeScreen(
 
 // Mock Note Card
 @Composable
-private fun NoteCard(title: String, content: String) {
+private fun NoteCard(
+    title: String,
+    content: String,
+    onClick: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clickable { onClick() },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFC6B8FF))
     ) {
@@ -132,7 +144,6 @@ private fun NoteCard(title: String, content: String) {
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = content,
                 color = Color.White.copy(alpha = 0.9f),
