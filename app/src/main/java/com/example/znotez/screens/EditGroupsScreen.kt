@@ -1,5 +1,6 @@
 package com.example.znotez.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun EditGroupScreen(
     onNavigateToHome: () -> Unit,
@@ -73,56 +75,70 @@ fun EditGroupScreen(
                 )
             }
 
-            Column(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.Center
             ) {
-                // Editable Group Name Field
-                OutlinedTextField(
-                    value = groupName,
-                    onValueChange = { groupName = it },
+                val isLandscape = maxWidth > maxHeight
+                val contentWidth = if (isLandscape) maxWidth * 0.5f else maxWidth
+
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFA8C5FF)),
-                    textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 18.sp),
-                    leadingIcon = {
-                        Icon(Icons.Default.Folder, contentDescription = null, tint = Color.White)
-                    },
-                    placeholder = { Text("Group name", color = Color.White.copy(alpha = 0.7f)) },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Two buttons side by side
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .width(contentWidth)
+                        .align(Alignment.Center)
                 ) {
-                    Button(
-                        onClick = onCancel,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.weight(1f).height(56.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.CreateNewFolder, contentDescription = "Cancel", tint = Color.Black)
-                    }
 
-                    Button(
-                        onClick = onSave,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.weight(1f).height(56.dp)
-                    ) {
-                        Icon(Icons.Default.Cancel, contentDescription = "Save", tint = Color.White)
+                        // Editable Group Name Field
+                        OutlinedTextField(
+                            value = groupName,
+                            onValueChange = { groupName = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFFA8C5FF)),
+                            textStyle = LocalTextStyle.current.copy(color = Color.White, fontSize = 18.sp),
+                            leadingIcon = {
+                                Icon(Icons.Default.Folder, null, tint = Color.White)
+                            },
+                            placeholder = { Text("Group name", color = Color.White.copy(alpha = 0.7f)) },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedBorderColor = Color.Transparent
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                onClick = onCancel,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFAEE6D8)),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.weight(1f).height(56.dp)
+                            ) {
+                                Icon(Icons.Default.CreateNewFolder, null, tint = Color.Black)
+                            }
+
+                            Button(
+                                onClick = onSave,
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4A6A6)),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier.weight(1f).height(56.dp)
+                            ) {
+                                Icon(Icons.Default.Cancel, null, tint = Color.White)
+                            }
+                        }
                     }
                 }
             }
